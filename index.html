@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳棋金字塔</title>
+    <style>
+        #restart {
+            position: absolute;
+            display: block;
+            top: 10px;
+            left: 10px;
+            color: blue;
+            background: yellow;
+            padding: 2px 5px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            font-weight: bolder;
+            cursor: pointer;
+            user-select: none;
+            z-index: 5;
+        }
+
+        #timer {
+            position: absolute;
+            display: block;
+            top: 40px;
+            left: 10px;
+            color: yellow;
+            padding: 2px 5px;
+            box-sizing: border-box;
+            font-weight: bolder;
+            text-shadow: 2px 2px black;
+            user-select: none;
+            z-index: 5;
+        }
+
+        #gameBoard {
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            background: rgb(168, 109, 61);
+        }
+
+        #intro {
+            position: absolute;
+            display: block;
+            top: 300px;
+            left: 0;
+            width: 300px;
+            max-height: calc(100vh - 300px);
+            overflow-y: scroll;
+            word-break: break-all;
+        }
+
+        .red {
+            color: red;
+            font-weight: bolder;
+        }
+
+        .chess, .chesshole {
+            position: absolute;
+            display: block;
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+
+        .chess {
+            background: rgb(82, 34, 12);
+            z-index: 5;
+        }
+
+        .chesshole {
+            z-index: 4;
+        }
+
+        .selected {
+            border: 3px solid yellow;
+        }
+
+        .n1 {top: 15px;left: 135px;}
+        .n2 {top: 75px;left: 107px;}
+        .n3 {top: 75px;left: 162px;}
+        .n4 {top: 135px;left: 80px;}
+        .n5 {top: 135px;left: 135px;}
+        .n6 {top: 135px;left: 192px;}
+        .n7 {top: 195px;left: 52px;}
+        .n8 {top: 195px;left: 107px;}
+        .n9 {top: 195px;left: 162px;}
+        .n10 {top: 195px;left: 217px;}
+        .n11 {top: 255px;left: 25px;}
+        .n12 {top: 255px;left: 80px;}
+        .n13 {top: 255px;left: 135px;}
+        .n14 {top: 255px;left: 190px;}
+        .n15 {top: 255px;left: 245px;}
+
+        .finish {
+            position: absolute;
+            display: block;
+            width: fit-content;
+            font-size: 20vw;
+            color: red;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            user-select: none;
+            z-index: 5;
+            animation-name: finish;
+            animation-duration: 5s;
+            opacity: 0;
+        }
+
+        .warning {
+            position: absolute;
+            display: block;
+            top: 70px;
+            left: 10px;
+            color: red;
+            padding: 2px 5px;
+            box-sizing: border-box;
+            box-shadow: 2px 2px black;
+            font-weight: bolder;
+            text-shadow: 1px 1px black;
+            background: rgb(255, 165, 165);
+            user-select: none;
+            z-index: 5;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        @media only screen and (max-width: 768px) {
+            #gameBoard {
+                width: 100vw;
+                height: 100vw;
+            }
+
+            #intro {
+                width: 100vw;
+                top: 100vw;
+            }
+            
+            .n1 {top: calc(10% - 15px);left: calc(50% - 15px);}
+            .n2 {top: calc(30% - 15px);left: calc(40% - 15px);}
+            .n3 {top: calc(30% - 15px);left: calc(60% - 15px);}
+            .n4 {top: calc(50% - 15px);left: calc(30% - 15px);}
+            .n5 {top: calc(50% - 15px);left: calc(50% - 15px);}
+            .n6 {top: calc(50% - 15px);left: calc(70% - 15px);}
+            .n7 {top: calc(70% - 15px);left: calc(20% - 15px);}
+            .n8 {top: calc(70% - 15px);left: calc(40% - 15px);}
+            .n9 {top: calc(70% - 15px);left: calc(60% - 15px);}
+            .n10 {top: calc(70% - 15px);left: calc(80% - 15px);}
+            .n11 {top: calc(90% - 15px);left: calc(10% - 15px);}
+            .n12 {top: calc(90% - 15px);left: calc(30% - 15px);}
+            .n13 {top: calc(90% - 15px);left: calc(50% - 15px);}
+            .n14 {top: calc(90% - 15px);left: calc(70% - 15px);}
+            .n15 {top: calc(90% - 15px);left: calc(90% - 15px);}
+
+        }
+
+        @keyframes finish {
+            0% {
+                opacity: 0;
+            }
+            
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <span id="restart">Restart</span>
+    <span id="timer">00:00</span>
+    <div id="gameBoard">
+        <span class="chess n1"></span>
+        <span class="chess n2"></span>
+        <span class="chess n3"></span>
+        <span class="chess n4"></span>
+        <span class="chess n5"></span>
+        <span class="chess n6"></span>
+        <span class="chess n7"></span>
+        <span class="chess n8"></span>
+        <span class="chess n9"></span>
+        <span class="chess n10"></span>
+        <span class="chess n11"></span>
+        <span class="chess n12"></span>
+        <span class="chess n13"></span>
+        <span class="chess n14"></span>
+        <span class="chess n15"></span>
+        
+        <span class="chesshole n1"></span>
+        <span class="chesshole n2"></span>
+        <span class="chesshole n3"></span>
+        <span class="chesshole n4"></span>
+        <span class="chesshole n5"></span>
+        <span class="chesshole n6"></span>
+        <span class="chesshole n7"></span>
+        <span class="chesshole n8"></span>
+        <span class="chesshole n9"></span>
+        <span class="chesshole n10"></span>
+        <span class="chesshole n11"></span>
+        <span class="chesshole n12"></span>
+        <span class="chesshole n13"></span>
+        <span class="chesshole n14"></span>
+        <span class="chesshole n15"></span>
+    </div>
+    <div id="intro">
+        <div class="red">玩法說明</div>
+        一、先選擇消除棋盤中某一顆棋子。<br>
+        二、以跳棋方式進行遊戲。每個棋子必須隔著一顆棋子進行移動，棋子在移動完畢後，被跨過的那顆棋子會消失。<br>
+        三、最後，棋盤上只留下一顆棋子便結束遊戲。
+    </div>
+    <script>
+        let start = false;
+        let timerItv;
+        window.onload = () => {
+            document.querySelectorAll('#gameBoard span').forEach(ele => {
+                ele.addEventListener('click', firstClick);
+            })
+            document.querySelector('#restart').addEventListener('click', restart);
+        }
+
+        function restart() {
+            document.querySelector('#gameBoard').remove();
+            let gameBoard = document.createElement('div');
+            gameBoard.id = 'gameBoard';
+            for (let i = 0; i < 15; i ++) {
+                let chess = document.createElement('span');
+                let chesshole = document.createElement('span');
+                chess.classList.add('chess');
+                chess.classList.add(`n${i + 1}`);
+                chesshole.classList.add('chesshole');
+                chesshole.classList.add(`n${i + 1}`);
+                gameBoard.append(chess);
+                gameBoard.append(chesshole);
+            }
+            document.querySelector('body').append(gameBoard);
+            document.querySelectorAll('#gameBoard span').forEach(ele => {
+                ele.addEventListener('click', firstClick);
+            })
+        }
+
+        function firstClick(event) {
+            if (!start) {
+                start = new Date();
+                timerItv = setInterval(() => {
+                    document.querySelector('#timer').innerHTML = getTimeData(new Date() - start);
+                }, 1000)
+            }
+            event.target.remove();
+            document.querySelectorAll('#gameBoard span').forEach(ele => {
+                ele.removeEventListener('click', firstClick);
+            })
+            document.querySelectorAll('#gameBoard span').forEach(ele => {
+                ele.addEventListener('click', move);
+            })
+        }
+
+        function getTimeData(mSecond) {
+            let nowS = Math.round(mSecond / 1000);
+            let s = nowS % 60;
+            let m = Math.floor(nowS / 60);
+            return `${m < 10 ? `0${m}` : m}:${s < 10 ? `0${s}` : s}`;
+        }
+        
+        function move(event) {
+            let action = getAction(event.path);
+            if (action == 'chess') {
+                clearSelected();
+                event.target.classList.add('selected')
+            } else if (action == 'chesshole') {
+                let selectNo = +getNumber(document.querySelector('.selected'))
+                let no = getNumber(event.target)
+                if (Object.keys(chessSetting[selectNo]).indexOf(no) != -1) {
+                    let deleteIndex = chessSetting[selectNo][no];
+                    let deleteEle = document.querySelector(`.chess.n${deleteIndex}`)
+                    if (deleteEle) {
+                        deleteEle.remove();
+                        document.querySelector('.selected').remove();
+                        let chessEle = document.createElement('span');
+                        chessEle.classList.add('chess');
+                        chessEle.classList.add('selected');
+                        chessEle.classList.add(`n${no}`)
+                        chessEle.addEventListener('click', move);
+                        document.querySelector('#gameBoard').append(chessEle);
+                        detectFinish();
+                    } else {
+                        warning('移動時，中間必須要有棋子')
+                    }
+                } else {
+                    warning('移動時，中間必須只能隔一個棋子')
+                }
+            }
+        }
+
+        function warning(str) {
+            let warning = document.createElement('span');
+            warning.className = 'warning';
+            warning.innerHTML = str;
+            document.querySelector('body').append(warning);
+            setTimeout(() => {
+                warning.style.opacity = 1;
+            }, 50);
+            setTimeout(() => {
+                warning.style.opacity = 0;
+            }, 3350);
+            setTimeout(() => {
+                warning.remove();
+            }, 3650);
+        }
+
+        function detectFinish() {
+            if (document.querySelectorAll('.chess').length == 1) {
+                clearInterval(timerItv);
+                document.querySelector('#restart').removeEventListener('click', restart);
+                document.querySelectorAll('#gameBoard span').forEach(ele => {
+                    ele.removeEventListener('click', move);
+                })
+                let fin = document.createElement('span');
+                fin.className = 'finish';
+                fin.innerHTML = '恭喜過關!';
+                document.querySelector('body').append(fin)
+            }
+        }
+
+        function clearSelected() {
+            document.querySelectorAll('.selected').forEach(ele => {
+                ele.classList.remove('selected')
+            })
+        }
+
+        function getAction(arr) {
+            return arr.map(el => {return el.className})
+                .filter(el => {return el})
+                .filter(el => {return el.includes('chesshole')})
+                .length ? 'chesshole' : 'chess';
+        }
+
+        function getNumber(ele) {
+            let index = -1;
+            ele.classList.forEach(className => {
+                if (className.indexOf('n') == 0) {
+                    index = className.substring(1, className.length);
+                }
+            })
+            if (index != -1) {
+                return index;
+            } else {
+                throw '棋子序號有誤'
+            }
+        }
+
+        const chessSetting = {
+            1: {
+                4: 2,
+                6: 3
+            },
+            2: {
+                7: 4,
+                9: 5
+            },
+            3: {
+                8: 5,
+                10: 6
+            },
+            4: {
+                1: 2,
+                6: 5,
+                11: 7,
+                13: 8
+            },
+            5: {
+                12: 8,
+                14: 9
+            },
+            6: {
+                1: 3,
+                4: 5,
+                13: 9,
+                15: 10
+            },
+            7: {
+                2: 4,
+                9: 8
+            },
+            8: {
+                3: 5,
+                10: 9
+            },
+            9: {
+                2: 5,
+                7: 8
+            },
+            10: {
+                3: 6,
+                8: 9
+            },
+            11: {
+                4: 7,
+                13: 12
+            },
+            12: {
+                5: 8,
+                14: 13
+            },
+            13: {
+                4: 8,
+                6: 9,
+                11: 12,
+                15: 14
+            },
+            14: {
+                5: 9,
+                12: 13
+            },
+            15: {
+                6: 10,
+                13: 14
+            }
+        }
+
+    </script>
+</body>
+</html>
